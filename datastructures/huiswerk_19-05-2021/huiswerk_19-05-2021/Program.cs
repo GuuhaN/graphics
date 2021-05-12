@@ -1,19 +1,58 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace huiswerk_19_05_2021
 {
     class Program
     {
+        /* 
+         Gemaakt door Mirza & Nigel
+         Huiswerk voor 19-05-2021
+         */
+
         // 2n - 3 flips
         static int amountOfFlips = 0;
+        static double[] wagens;
         static void Main(string[] args)
         {
-            PancakeSort(new int[] { 8, 4, 5, 10 });
-            // QuickSort(new double[] { 3.12, 1.00, 4.2, 0.40, 15.3, 18.2, 5.7, 8.234, 10, 2.5 });
+            PancakeSort(new int[] { 8, 4, 5, 10 }); // PancakeSort uitvoeren
+            DoQuickSort(); // QuickSort uitvoeren
+            ZwareKlus(Convert.ToInt32(Console.ReadLine())); // Zware klus uitvoeren (vraag 4b) & vraagt input user van aantal tonnen
         }
 
-        static int FindBiggestPancake(int[] pancakes, int length)
+        static void DoQuickSort()
+        {
+            wagens = new double[] { 3.12, 1.00, 4.2, 0.40, 15.3, 18.2, 5.7, 8.234, 10, 2.5 }; // Definieer de wagens
+            QuickSort(wagens, 0, wagens.Length - 1); // Start de quicksort
+            string totaleWagensTekst = ""; /* ALLEEN OM TEKST MOOI TE MAKEN */
+            foreach (var item in wagens)
+            {
+                totaleWagensTekst += item + ", ";
+            }
+            Console.WriteLine(totaleWagensTekst);
+        }
+
+        static void ZwareKlus(int tonnenLimiet)
+        {
+            double tonnen = 0; // Teller voor tonnen
+            List<double> totaleWagens = new List<double>(); // List makkelijker objecten toe te voegen dan array.
+            for (int i = wagens.Length - 1; i >= 0; i--)
+            {
+                if (tonnen >= tonnenLimiet) // Over het limiet? Break de loop
+                    break;
+
+                tonnen += wagens[i]; // Zo niet, dan optellen en wagen toe te voegen.
+                totaleWagens.Add(wagens[i]);
+            }
+
+            string totaleWagensTekst = ""; /* OOK ALLEEN VOOR TEKST :) */
+            foreach (double item in totaleWagens)
+                totaleWagensTekst += item + ", ";
+
+            Console.WriteLine(totaleWagensTekst + " - Tonnen: " + tonnen);
+        }
+
+        static int FindBiggestPancake(int[] pancakes, int length) // Alleen om de grootste pannenkoek te vinden
         {
             int biggest = 0;
             for (int i = 1; i <= length; i++)
@@ -51,14 +90,13 @@ namespace huiswerk_19_05_2021
         {
             for (var i = pancakes.Length - 1; i >= 0; i--)
             {
-                // get the position of the maximum element of the subarray
+                // Vind de index van de grootste pannenkoek
                 var indexOfMax = FindBiggestPancake(pancakes, i);
                 if (indexOfMax != i)
                 {
-                    // flip the array to the maximum element index
-                    // the maximum element of the subarray will be located at the beginning
+                    // Flip de grootste pannenkoek
                     Flip(pancakes, indexOfMax); // [10, 5, 4, 8]
-                    // flip the entire subarray
+                    // Flip de hele stapel pannenkoeken :)
                     Flip(pancakes, i); // [8, 4, 5, 10]
                 }
             }
@@ -67,9 +105,9 @@ namespace huiswerk_19_05_2021
             return pancakes;
         }
 
-        static void ShowSorting(int[] pancakes)
+        static void ShowSorting(int[] pancakes) // ALLEEN OM DE TEKST LEESBAAR TE MAKEN
         {
-            string sorted = "";
+            string sorted = ""; 
             foreach (int pancake in pancakes)
             {
                 sorted += pancake + ", ";
@@ -80,29 +118,30 @@ namespace huiswerk_19_05_2021
 
         static void QuickSort(double[] wagens, int left, int right)
         {
-            int pivot = wagens.Length / 2;
-            int index = Partition(wagens, left, right, pivot);
-            for (int i = 0; i < wagens.Length; i++)
-            {
-                double temp = wagens[i];
-            }
+            if (left >= right) // Als de linker nummer >= dan rechts, dan is de quicksort goed :)
+                return;
+
+            double pivot = wagens[(left + right) / 2]; // Voor de snelste performance, is bij quicksort de middelste pivot het beste.
+            int index = Partition(wagens, left, right, pivot); // Index vinden van de pivot en elke keer als je em in stukken snijd.
+            QuickSort(wagens, left, index - 1); // Recursion, want er moeten verschillende indexen worden verwisseld. Dus deze verplaatst iets naar de linkerkant van de pivot
+            QuickSort(wagens, index, right); // En hier ook recursion, van alles naar rechts verplaatsen.
         }
 
-        static int Partition(double[] wagens, int left, int right, int pivot)
+        static int Partition(double[] wagens, int left, int right, double pivot)
         {
             while (left <= right)
             {
-                while (wagens[left] < pivot)
+                while (wagens[left] < pivot) // Blijft zoeken tot er een waarde links van kleiner dan de pivot is
                     left++;
 
-                while (wagens[right] > pivot)
-                    right++;
-
-                if(left <= right)
-                {
-                    Flip(wagens, left, right);
-                    left++;
+                while (wagens[right] > pivot) // Blijft zoeken tot er een waarde rechts van kleiner dan de pivot is
                     right--;
+
+                if(left <= right) // Alleen omwisselen als de waarde links van de pivot staat
+                {
+                    Flip(wagens, left, right); // Hier flip je
+                    left++; // na de flip doorgaan met zoeken van links
+                    right--; // en van rechts
                 }
             }
 
