@@ -10,8 +10,7 @@ namespace inpakken
         {
             Inpakken();
         }
-
-        static int[] DissectInput()
+        private static int[] DissectInput()
         {
             string input = Console.ReadLine();
             string[] splitInput = input.Split(null);
@@ -30,7 +29,6 @@ namespace inpakken
             while (minNum <= maxNum)
             {
                 int middle = (minNum + maxNum) / 2;
-
                 // Verplaatst de start van het middle punt naar rechts als het pakket groter is het doos
                 if (dozen[middle] <= pakketGrootte)
                     minNum = middle + 1;
@@ -45,21 +43,21 @@ namespace inpakken
             return dozen[index];
         }
 
-        static void Inpakken()
+        private static void Inpakken()
         {
             int[] input = DissectInput();
             long count = 0;
-            List<int> dozen = new List<int>();
+            int[] dozen = new int[input[0]];
 
             for (int i = 0; i < input[0]; i++)
-                dozen.Add(Convert.ToInt32(Console.ReadLine().Split()[0]));
+                dozen[i] = Convert.ToInt32(Console.ReadLine().Split()[0]);
 
             int aantalPakketjes = input[1];
             string checkInput = "";
-            while(aantalPakketjes > 0)
+            while (aantalPakketjes > 0)
             {
                 checkInput = Console.ReadLine().Split()[0];
-                count += DozenBinarySearch(dozen.ToArray(), Convert.ToInt32(checkInput));
+                count += DozenBinarySearch(dozen, Convert.ToInt32(checkInput));
                 aantalPakketjes--;
             }
             Console.WriteLine(count);
