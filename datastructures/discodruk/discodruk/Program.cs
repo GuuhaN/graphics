@@ -6,7 +6,7 @@ namespace discodruk
 {
     class Program
     {
-        static List<(int aankomst,int vertrek)> tijdstippen = new List<(int, int)>();
+        static List<int> aankomst = new List<int>(), vertrek = new List<int>();
         static void Main(string[] args)
         {
             DiscoDruk();
@@ -14,13 +14,20 @@ namespace discodruk
 
         static void Debug() 
         {
-            tijdstippen.Add((12, 30));
-            tijdstippen.Add((18, 25));
-            tijdstippen.Add((25, 40));
-            tijdstippen.Add((13, 15));
-            tijdstippen.Add((32, 36));
+            aankomst.Add(12);
+            aankomst.Add(18);
+            aankomst.Add(25);
+            aankomst.Add(13);
+            aankomst.Add(32);
 
-            SortTijdstippen(tijdstippen);
+            vertrek.Add(30);
+            vertrek.Add(25);
+            vertrek.Add(40);
+            vertrek.Add(15);
+            vertrek.Add(36);
+
+            aankomst.Sort();
+            vertrek.Sort();
         }
 
         static void ReadInput()
@@ -29,35 +36,55 @@ namespace discodruk
             for (int i = 0; i < aantalBezoekers; i++)
             {
                 string[] incoming = Console.ReadLine().Split();
-                tijdstippen.Add((Convert.ToInt32(incoming[1]), Convert.ToInt32(incoming[2])));
+                aankomst.Add(Convert.ToInt32(incoming[1]));
+                vertrek.Add(Convert.ToInt32(incoming[2]));
             }
 
-            SortTijdstippen(tijdstippen);
-        }
-
-        static void SortTijdstippen(List<(int aankomst, int vertrek)> lijstVanTijdstippen)
-        {
-            IEnumerable<(int, int)> lijstInOrder = lijstVanTijdstippen.OrderBy(x => x.aankomst);
-            tijdstippen = lijstInOrder.ToList();
+            aankomst.Sort();
+            vertrek.Sort();
         }
 
         static void DiscoDruk()
         {
             //Debug(); // DEBUG
             ReadInput(); // PRODUCTION
-            int laatstMaxBezoekersBinnen = 0;
-            for (int time = tijdstippen.Min(x => x.aankomst); time < tijdstippen.Max(x => x.vertrek); time++)
+            int n = 0;
+            int maxPersonenTemp = 0;
+            int maximum = 0;
+
+            List<int> personen = new List<int>();
+            List<(int, int)> tijden = new List<(int, int)>();
+            for (int i = 0; i < vertrek.Count; i++)
             {
-                int aantalBezoekersBinnen = 0;
-                for (int i = 0; i < tijdstippen.Count; i++)
+                int duplicateTemp = -1;
+                while (n < aankomst.Count && aankomst[n] <= vertrek[i])
                 {
-                    if(tijdstippen[i].aankomst <= time && time < tijdstippen[i].vertrek)
-                        aantalBezoekersBinnen++;
+                    if (aankomst[n] != vertrek[i])
+                    {
+                        maxPersonenTemp++;
+                        duplicateTemp = -1;
+                    }
+                    else
+                    {
+                        i++;
+                        duplicateTemp--;
+                    }
+
+                    n++;
                 }
-                if (aantalBezoekersBinnen >= laatstMaxBezoekersBinnen)
-                    laatstMaxBezoekersBinnen = aantalBezoekersBinnen;
+                personen.Add(maxPersonenTemp);
+                tijden.Add((aankomst[n + duplicateTemp], vertrek[i]));
+                if (maxPersonenTemp > maximum)
+                    maximum = maxPersonenTemp;
+                maxPersonenTemp--;
             }
-            Console.WriteLine(laatstMaxBezoekersBinnen.ToString());
+
+            Console.WriteLine(maximum);
+            for (int i = 0; i < personen.Count; i++)
+            {
+                if(personen[i] == maximum)
+                    Console.WriteLine("Van " + tijden[i].Item1 + " tot " + tijden[i].Item2);
+            }
         }
     }
 }
