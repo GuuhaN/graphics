@@ -8,7 +8,6 @@ namespace motormerge
     {
         static List<(string, int, int, int)> motors = new List<(string, int, int, int)>();
         enum Filter { Snelheid = 2, Gewicht = 3};
-        Filter filter = new Filter();
         static void Main(string[] args)
         {
             MotorMerge();
@@ -23,12 +22,22 @@ namespace motormerge
                 motors.Add((motorInput[0], Convert.ToInt32(motorInput[1]), Convert.ToInt32(motorInput[2]), Convert.ToInt32(motorInput[3])));
             }
 
-            var mergeSortedList = MergeSort(motors, Filter.Snelheid);
-            mergeSortedList.Reverse();
+            var mergeSortedListLeft = MergeSort(motors, Filter.Snelheid);
+            var mergeSortedListRight = MergeSort(motors, Filter.Gewicht);
             Console.WriteLine(motors.Count);
-            foreach (var item in mergeSortedList)
+            for (int i = 0; i < motors.Count; i++)
             {
-                Console.WriteLine(item.Item1);
+                string temp = mergeSortedListLeft[i].Item1;
+                for (int j = mergeSortedListLeft[i].Item1.Length; j < 21; j++)
+                {
+                    temp += ".";
+                }
+                temp += mergeSortedListRight[i].Item1;
+                for (int k = mergeSortedListRight[i].Item1.Length; k < 21; k++)
+                {
+                    temp += ".";
+                }
+                Console.WriteLine(temp);
             }
         }
 
@@ -61,16 +70,53 @@ namespace motormerge
         {
             if (filter == Filter.Snelheid)
             {
-                int[] aSplit = a.Item3.ToString().Select(x => Convert.ToInt32(x.ToString())).ToArray();
-                int[] bSplit = b.Item3.ToString().Select(x => Convert.ToInt32(x.ToString())).ToArray();
-                if (aSplit[0] <= bSplit[0] && aSplit[1] <= bSplit[1] && aSplit[2] <= bSplit[2])
+                if (a.Item2 < b.Item2)
                     return true;
-                else
-                    return false;
+                else if (a.Item2 == b.Item2)
+                {
+                    if (a.Item3 > b.Item3)
+                        return true;
+                    else if (a.Item3 == b.Item3)
+                    {
+                        if (a.Item4 < b.Item4)
+                            return true;
+                        else if (a.Item4 == b.Item4)
+                        {
+                            if (string.Compare(a.Item1, b.Item1) < 0)
+                                return true;
+                            else
+                                return false;
+                        }
+                        else return false;
+                    }
+                    else return false;
+                }
+                else return false;
             }
             else
             {
-                return a.Item4 <= b.Item4;
+                if (a.Item3 > b.Item3)
+                    return true;
+                else if(a.Item3 == b.Item3)
+                {
+                    if (a.Item4 < b.Item4)
+                        return true;
+                    else if(a.Item4 == b.Item4)
+                    {
+                        if (a.Item2 < b.Item2)
+                            return true;
+                        else if (a.Item2 == b.Item2)
+                        {
+                            if (string.Compare(a.Item1, b.Item1) < 0)
+                                return true;
+                            else
+                                return false;
+                        }
+                        else return false;
+                    }
+                    else return false;
+                }
+                else return false;
             }
         }
 
