@@ -28,13 +28,14 @@ namespace motormerge
             for (int i = 0; i < motors.Count; i++)
             {
                 string temp = mergeSortedListLeft[i].Item1;
-                for (int j = mergeSortedListLeft[i].Item1.Length; j < 21; j++)
+                for (int j = mergeSortedListLeft[i].Item1.Length; j < 42; j++)
                 {
-                    temp += ".";
-                }
-                temp += mergeSortedListRight[i].Item1;
-                for (int k = mergeSortedListRight[i].Item1.Length; k < 21; k++)
-                {
+                    if (j == 21)
+                    {
+                        temp += mergeSortedListRight[i].Item1;
+                        j += mergeSortedListRight[i].Item1.Length;
+                    }
+                        
                     temp += ".";
                 }
                 Console.WriteLine(temp);
