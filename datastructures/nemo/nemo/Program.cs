@@ -13,12 +13,10 @@ namespace nemo
         static int maxCages = 0;
         static int maxWeight = 0;
 
-        static int huidigeAantal = 0;
         static int huidigeHokken = 0;
         static int huidigeGewicht = 0;
 
         static uint animalsInCart = 0;
-        static uint animalsInCartTemp = 0;
 
         static void Main(string[] args)
         {
@@ -54,50 +52,51 @@ namespace nemo
             if(split[0].Equals("p"))
             {
                 int animalKey = Convert.ToInt32(split[1]);
-                if ((animalsInCart & (1 << animalKey)) > 0)
+                if ((animalsInCart & (1 << animalKey)) > 0 || 
+                    huidigeHokken >= maxCages || 
+                    huidigeGewicht + bedreigdeAnimals[animalKey] > maxWeight) // IF ANIMAL EXISTS, NO MORE CAGES OR TOO HEAVY
                 {
-                    Console.WriteLine("WEIGER {0}", animalKey);
+                    Console.WriteLine("WEIGER " + animalKey);
+                    if (configurations.ContainsKey((int)animalsInCart))
+                        configurations[(int)animalsInCart]++;
+                    else
+                        configurations.Add((int)animalsInCart, 1);
                 }
                 else
                 {
-                    if (bedreigdeAnimals[animalKey] + huidigeGewicht <= maxWeight &&
-                        huidigeHokken + 1 <= maxCages)
+                    if(huidigeHokken < maxCages &&
+                    huidigeGewicht + bedreigdeAnimals[animalKey] <= maxWeight)
                     {
                         animalsInCart |= (uint)(1 << animalKey);
                         huidigeGewicht += bedreigdeAnimals[animalKey];
-                        huidigeAantal++;
                         huidigeHokken++;
-                    }
-                    else if(bedreigdeAnimals[animalKey] + huidigeGewicht > maxWeight ||
-                        huidigeHokken + 1 > maxCages)
-                    {
-                        Console.WriteLine("WEIGER {0}", animalKey);
+                        if (configurations.ContainsKey((int)animalsInCart))
+                            configurations[(int)animalsInCart]++;
+                        else
+                            configurations.Add((int)animalsInCart, 1);
                     }
                 }
-                animalsInCartTemp |= (uint)(1 << animalKey);
-                if (configurations.ContainsKey((int)animalsInCartTemp))
-                    configurations[(int)animalsInCartTemp] += 1;
-                else
-                    configurations.Add((int)animalsInCartTemp, 1);
-
             }
             if (split[0].Equals("l"))
             {
                 int animalKey = Convert.ToInt32(split[1]);
-
-                for (int i = 0; i < maxAnimalTypes; i++)
+                if ((animalsInCart & (1 << animalKey)) > 0) // IF ANIMAL EXISTS
                 {
-                    if ((animalsInCart & (1 << i)) > 0)
-                    {
-                        animalsInCart &= (uint)~(1 << animalKey);
-                        huidigeGewicht -= bedreigdeAnimals[animalKey];
-                        huidigeAantal--;
-                        huidigeHokken--;
-                    }
+                    animalsInCart &= (uint)~(1 << animalKey);
+                    huidigeGewicht -= bedreigdeAnimals[animalKey];
+                    huidigeHokken--;
+                    if (configurations.ContainsKey((int)animalsInCart))
+                        configurations[(int)animalsInCart]++;
+                    else
+                        configurations.Add((int)animalsInCart, 1);
                 }
-                animalsInCartTemp &= (uint)~(1 << animalKey);
-                if (configurations.ContainsKey((int)animalsInCartTemp))
-                    configurations[(int)animalsInCartTemp] += 1;
+                else
+                {
+                    if (configurations.ContainsKey((int)animalsInCart))
+                        configurations[(int)animalsInCart]++;
+                    else
+                        configurations.Add((int)animalsInCart, 1);
+                }
             }
             if (split[0].Equals("a"))
             {
@@ -115,10 +114,13 @@ namespace nemo
             {
                 if(configurations.ContainsKey((int)animalsInCart))
                     Console.WriteLine("HERHAALD " + configurations[(int)animalsInCart]);
+
+                if (animalsInCart == 0 && maxAnimalTypes == 0)
+                    Console.WriteLine("HERHAALD 0");
             }
             if (split[0].Equals("q"))
             {
-                Console.WriteLine("Aantal " + huidigeAantal + " Gewicht " + huidigeGewicht);
+                Console.WriteLine("Aantal " + huidigeHokken + " Gewicht " + huidigeGewicht);
             }
         }
     }
