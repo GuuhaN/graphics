@@ -13,8 +13,8 @@ namespace nemo
         static int maxCages = 0;
         static int maxWeight = 0;
 
-        static int huidigeHokken = 0;
-        static int huidigeGewicht = 0;
+        static int countCages = 0;
+        static int countWeight = 0;
 
         static uint animalsInCart = 0;
 
@@ -53,8 +53,8 @@ namespace nemo
             {
                 int animalKey = Convert.ToInt32(split[1]);
                 if ((animalsInCart & (1 << animalKey)) > 0 || 
-                    huidigeHokken >= maxCages || 
-                    huidigeGewicht + bedreigdeAnimals[animalKey] > maxWeight) // IF ANIMAL EXISTS, NO MORE CAGES OR TOO HEAVY
+                    countCages >= maxCages || 
+                    countWeight + bedreigdeAnimals[animalKey] > maxWeight) // IF ANIMAL EXISTS, NO MORE CAGES OR TOO HEAVY
                 {
                     Console.WriteLine("WEIGER " + animalKey);
                     if (configurations.ContainsKey((int)animalsInCart))
@@ -64,12 +64,12 @@ namespace nemo
                 }
                 else
                 {
-                    if(huidigeHokken < maxCages &&
-                    huidigeGewicht + bedreigdeAnimals[animalKey] <= maxWeight)
+                    if(countCages < maxCages &&
+                    countWeight + bedreigdeAnimals[animalKey] <= maxWeight)
                     {
                         animalsInCart |= (uint)(1 << animalKey);
-                        huidigeGewicht += bedreigdeAnimals[animalKey];
-                        huidigeHokken++;
+                        countWeight += bedreigdeAnimals[animalKey];
+                        countCages++;
                         if (configurations.ContainsKey((int)animalsInCart))
                             configurations[(int)animalsInCart]++;
                         else
@@ -83,8 +83,8 @@ namespace nemo
                 if ((animalsInCart & (1 << animalKey)) > 0) // IF ANIMAL EXISTS
                 {
                     animalsInCart &= (uint)~(1 << animalKey);
-                    huidigeGewicht -= bedreigdeAnimals[animalKey];
-                    huidigeHokken--;
+                    countWeight -= bedreigdeAnimals[animalKey];
+                    countCages--;
                     if (configurations.ContainsKey((int)animalsInCart))
                         configurations[(int)animalsInCart]++;
                     else
@@ -120,7 +120,7 @@ namespace nemo
             }
             if (split[0].Equals("q"))
             {
-                Console.WriteLine("Aantal " + huidigeHokken + " Gewicht " + huidigeGewicht);
+                Console.WriteLine("Aantal " + countCages + " Gewicht " + countWeight);
             }
         }
     }
